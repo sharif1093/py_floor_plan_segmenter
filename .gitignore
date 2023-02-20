@@ -1,7 +1,5 @@
 # User rules
 sandbox/out
-*.png
-*.pgm
 *.bin
 *.log
 *.dat
