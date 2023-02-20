@@ -34,8 +34,7 @@ COPY ./requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip setuptools wheel \
   && pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
-# Copy files
-COPY ./py_floor_plan_segmenter /app/py_floor_plan_segmenter
+# Change ownership of the /app directory
 RUN chown -R ${WORK_USER}:${WORK_USER} /app
 
 # Set env variables
@@ -43,8 +42,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH /app
 
-WORKDIR ${USER_HOME}
+WORKDIR /app
 
 EXPOSE 8008
-
-CMD ["uvicorn", "py_floor_plan_segmenter.server:app", "--host", "0.0.0.0", "--port", "8008"]

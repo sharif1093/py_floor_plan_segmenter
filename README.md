@@ -8,7 +8,7 @@
 # Build the docker image
 docker build -t py_floor_plan_segmenter .
 # Running the container in interactive mode
-docker run -u cloud -v ./sandbox:/app/sandbox -it py_floor_plan_segmenter bash
+docker run -u cloud -v .:/app -it py_floor_plan_segmenter bash
 
 # Example command to only do the segmentation
 python -m py_floor_plan_segmenter -i /app/sandbox/maps/sample -p /app/sandbox/out
@@ -26,3 +26,5 @@ cd py_room_segmenter
 docker-compose build --no-cache
 docker-compose up -d
 ```
+
+Then, open your browser at the address: `http://0.0.0.0:8008/docs`
