@@ -7,8 +7,8 @@ binary_threshold: &binary_threshold 0.2
 area_threshold: &area_threshold 1
 hist_resolution: &hist_resolution 90
 
-# Use with alignment=true only.
-alignment: true
+# Use with alignment=true only if sigma_step=0.
+alignment: false
 
 # Detailed Settings
 find_alignment_angle:
@@ -50,13 +50,13 @@ generate_denoised_alone:
     connectivity: 8
   
   ### NOTE: "Mean" mode is useful to ignore large furniture and detect actual rooms.
-  components_in/remove_small_connected_components:
-    method: mean
-    connectivity: 8
-  ### NOTE: "Fixed" mode is useful when we want to segment with respect to large furniture and make priors "smaller".
   # components_in/remove_small_connected_components:
-  #   method: fixed
-  #   min_size: 500
+  #   method: mean
+  #   connectivity: 8
+  ### NOTE: "Fixed" mode is useful when we want to segment with respect to large furniture and make priors "smaller".
+  components_in/remove_small_connected_components:
+    method: fixed
+    min_size: 60
   ### NOTE: "Fixed" mode is useful when we want to segment with respect to large furniture and make priors "smaller".
   # components_in/remove_small_connected_components:
   #   method: fixed

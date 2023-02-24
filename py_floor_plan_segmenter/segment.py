@@ -9,6 +9,18 @@ from skimage.filters import meijering
 from skimage.segmentation import watershed
 
 
+def load_map_from_file_uint8(path: Path):
+    """This function loads a map file.
+
+    Args:
+        path (Path): The path to the map.
+
+    Returns:
+        np.ndarray: The 3-channel RGB loaded map with dtype (np.uint8) and size (width, height, 3)
+    """
+    return np.asarray(cv2.imread(str(path)), dtype=np.uint8)
+
+
 def load_map_from_file(path: Path):
     """This function loads a map file.
 
