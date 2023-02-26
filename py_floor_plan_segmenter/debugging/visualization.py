@@ -240,12 +240,12 @@ def visualize_common_borders_map(output_path: Path, common_borders_map):
     plt.savefig(output_path / "common_borders_map.png", dpi=600)
 
 
-def visualize_final_segmentation(output_path: Path, G, segments, cropped):
+def visualize_segmentation(output_path: Path, G, segments, cropped, name):
     segments_color = convert_uint8_to_rgb_random(segments, [0])
     highlighted_segment = highlight(cropped, segments_color, (1., 1., 1.), 0.6)
 
     _, ax = plt.subplots(1, 1)
     show_image(ax, highlighted_segment)
-    plt.savefig(output_path / "final_segmentation_no_graph.png", dpi=600)
+    plt.savefig(output_path / f"{name}_no_graph.png", dpi=600)
     draw_graph(ax, G)
-    plt.savefig(output_path / "final_segmentation.png", dpi=600)
+    plt.savefig(output_path / f"{name}.png", dpi=600)

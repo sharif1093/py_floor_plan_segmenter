@@ -167,6 +167,23 @@ def create_priory_queue(G: nx.Graph):
     return q
 
 
+def create_priority_queue_based_on_edges(G: nx.Graph):
+    """Returns a list of edges sorted by edge lengths.
+
+    Args:
+        G (nx.Graph): The input graph representation.
+
+    Returns:
+        SortedList: List of all graph edges sorted by longest edge to shortest.
+    """
+    q = SortedList()
+    for edge in G.edges(data=True):
+        length = edge[2]['length']
+        e = (min(edge[0], edge[1]), max(edge[0], edge[1]))
+        q.add((-length, e))
+    return q
+
+
 def find_best_edge(G: nx.Graph, u):
     # We assume that degree of node is greater than 0.
     edge_sorted = SortedList()
@@ -192,6 +209,15 @@ def find_best_priority_for_merge(G: nx.Graph, priority: SortedList, area_thresho
     return None
 
 
+def find_best_priority_for_merge_by_edge(G: nx.Graph, priority: SortedList, length_threshold: float):
+    for length, edge in priority:
+        length = -length
+        if length > length_threshold:
+            return edge
+
+    return None
+
+
 def merge_nodes_in_place(G: nx.Graph, segments: np.ndarray, common_borders_map: np.ndarray, borders, border_label, **config):
     while True:
         G, segments = clean_small_disconnected_segments_in_place(
@@ -202,7 +228,28 @@ def merge_nodes_in_place(G: nx.Graph, segments: np.ndarray, common_borders_map: 
         if edge is None:
             break
         u, v = min(edge), max(edge)
+        # print(f"Merging {u} and {v} because of node criteria.")
+        segments, common_borders_map, borders = \
+            merge_segments_map_in_place(
+                G, segments, common_borders_map, borders, u, v, border_label)
+        G = merge(G, u, v)
 
+    return G, segments, common_borders_map, borders
+
+
+def merge_edges_in_place(G: nx.Graph, segments: np.ndarray, common_borders_map: np.ndarray, borders, border_label, **config):
+
+    while True:
+        # priority: SortedList[(Length, Edge(u,v))]
+        priority = create_priority_queue_based_on_edges(G)
+
+        edge = find_best_priority_for_merge_by_edge(
+            G, priority, config["length_threshold"])
+        if edge is None:
+            break
+
+        u, v = min(edge), max(edge)
+        # print(f"Merging {u} and {v} because of large length.")
         segments, common_borders_map, borders = \
             merge_segments_map_in_place(
                 G, segments, common_borders_map, borders, u, v, border_label)

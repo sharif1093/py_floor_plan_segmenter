@@ -4,7 +4,8 @@ sigma_step: &sigma_step 0.5
 # sigma_start: &sigma_start 7.5
 # sigma_step: &sigma_step 0.0
 binary_threshold: &binary_threshold 0.2
-area_threshold: &area_threshold 1
+area_threshold: &area_threshold 1 # m^2
+length_threshold: &length_threshold 2.5 # m
 hist_resolution: &hist_resolution 90
 
 # Use with alignment=true only if sigma_step=0.
@@ -94,3 +95,5 @@ over_segment:
     connectivity: 4
 merge_nodes_in_place:
   area_threshold: *area_threshold
+merge_edges_in_place:
+  length_threshold: *length_threshold

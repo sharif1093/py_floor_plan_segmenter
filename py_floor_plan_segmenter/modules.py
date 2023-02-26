@@ -9,6 +9,7 @@ from py_floor_plan_segmenter.segment import uncrop_background, remap_border
 from py_floor_plan_segmenter.over_segment import remap, find_consistent_global_labels, find_lifespans, generate_map_initial_seeds, superpose_map_initial_seeds
 from py_floor_plan_segmenter.graph import find_graph_representation
 from py_floor_plan_segmenter.merge import merge_nodes_in_place
+from py_floor_plan_segmenter.merge import merge_edges_in_place
 
 from py_floor_plan_segmenter.debugging.debugging_factory import debugger
 from py_floor_plan_segmenter.map_alignment import find_alignment_angle, rotate_image
@@ -169,6 +170,7 @@ def do_segment(raw, **config):
         segments, border_label)
     debugger.add("G1", G)
 
+    # merge_nodes_in_place
     G, segments, common_borders_map, borders = merge_nodes_in_place(G,
                                                                     segments,
                                                                     common_borders_map,
@@ -176,6 +178,20 @@ def do_segment(raw, **config):
                                                                     border_label,
                                                                     **config["merge_nodes_in_place"])
     debugger.add("G2", G)
-    debugger.add("segments_merged", segments)
+    debugger.add("segments_merged_by_node", segments)
+
+    # merge_edges_in_place: Merge very large edges.
+    # LIMITATIONS: 1) We count the shared border pixels as the edge length. This simply is not correct.
+    #                 Should be using Euclidean distance instead.
+    #              2) We count all shared border pixels between two segments together, even though they'
+    #                 are disjoint. Rather, one should count the largest.
+    G, segments, common_borders_map, borders = merge_edges_in_place(G,
+                                                                    segments,
+                                                                    common_borders_map,
+                                                                    borders,
+                                                                    border_label,
+                                                                    **config["merge_edges_in_place"])
+    debugger.add("G3", G)
+    debugger.add("segments_merged_by_edge", segments)
 
     return prepare_segments_for_export(segments, crop_info)

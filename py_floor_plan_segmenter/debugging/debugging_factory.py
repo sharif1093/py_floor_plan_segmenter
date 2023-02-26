@@ -5,7 +5,7 @@ import pprint
 import yaml
 import numpy as np
 
-from py_floor_plan_segmenter.debugging.visualization import visualize_final_segmentation, visualize_graph, visualize_segments_double, plot_sigmas_vs_ncc, plot_segment_debug, gen_highlighted_seeds, gen_highlighted_segments, plot_hist_and_sliding_average
+from py_floor_plan_segmenter.debugging.visualization import visualize_segmentation, visualize_graph, visualize_segments_double, plot_sigmas_vs_ncc, plot_segment_debug, gen_highlighted_seeds, gen_highlighted_segments, plot_hist_and_sliding_average
 from py_floor_plan_segmenter.debugging.animation import FrameStacker, FrameStackerToFile
 from collections import OrderedDict
 
@@ -51,13 +51,32 @@ class DebuggingFactory(metaclass=Singleton):
             yaml.dump(self.config, f, Dumper=yaml.SafeDumper, sort_keys=False)
 
         if self.collection["is_range"]:
-            # final_segmentation.png & final_segmentation_no_graph.png
-            visualize_final_segmentation(
-                output_path, self.collection["G2"], self.collection["segments_merged"], self.collection["cropped"])
+            # merge_by_edge.png & merge_by_edge_no_graph.png
+            visualize_segmentation(output_path,
+                                   G=self.collection["G3"],
+                                   segments=self.collection["segments_merged_by_edge"],
+                                   cropped=self.collection["cropped"],
+                                   name="merge_by_edge")
+
+            # merge_by_node.png & merge_by_node_no_graph.png
+            visualize_segmentation(output_path,
+                                   G=self.collection["G2"],
+                                   segments=self.collection["segments_merged_by_node"],
+                                   cropped=self.collection["cropped"],
+                                   name="merge_by_node")
+
+            # before_merge.png & before_merge_no_graph.png
+            visualize_segmentation(output_path,
+                                   G=self.collection["G1"],
+                                   segments=self.collection["segments_fine"],
+                                   cropped=self.collection["cropped"],
+                                   name="before_merge")
 
             # graph.png
-            visualize_graph(
-                output_path, self.collection["G1"], self.collection["segments_fine"], "graph")
+            visualize_graph(output_path,
+                            G=self.collection["G1"],
+                            segments=self.collection["segments_fine"],
+                            name="graph")
 
             # oversegmented.png
             title = "Oversegmented map"
