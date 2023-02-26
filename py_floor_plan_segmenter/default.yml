@@ -5,7 +5,7 @@ sigma_step: &sigma_step 0.5
 # sigma_step: &sigma_step 0.0
 binary_threshold: &binary_threshold 0.2
 area_threshold: &area_threshold 1 # m^2
-length_threshold: &length_threshold 2.5 # m
+length_threshold: &length_threshold 3 # m
 hist_resolution: &hist_resolution 90
 
 # Use with alignment=true only if sigma_step=0.

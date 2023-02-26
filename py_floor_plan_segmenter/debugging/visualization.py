@@ -71,7 +71,6 @@ def convert_uint8_to_rgb_random(target, exclude=[]):
     label_map = {i: labels[i] for i in range(len(labels))}
     colors = [(i/(len(labels)+2) * 360, 200, 200) for i in range(len(labels))]
     random.shuffle(colors)
-    # print(colors)
 
     target_rgb = cv2.cvtColor(target, cv2.COLOR_GRAY2RGB)
     target_hsv = cv2.cvtColor(target_rgb, cv2.COLOR_RGB2HSV)
@@ -83,6 +82,27 @@ def convert_uint8_to_rgb_random(target, exclude=[]):
             target_hsv[target == label_map[i]] = (120, 120, 0)
 
     target_rgb = cv2.cvtColor(target_hsv, cv2.COLOR_HSV2RGB)
+    return np.float32(target_rgb * 1./255)
+
+
+def convert_uint8_to_rgb_random_rgb(target, exclude=[]):
+    # target: Must be a grayscale image with type np.uint8 (CV_8UC1)
+    #         Each color in target will be converted to a unique color.
+    labels = np.unique(target)
+    label_map = {i: labels[i] for i in range(len(labels))}
+    colors = [(np.random.randint(0, 255), np.random.randint(0, 255),
+               np.random.randint(0, 255)) for _ in range(1, labels.max() + 1)]
+
+    target_rgb = cv2.cvtColor(target, cv2.COLOR_GRAY2RGB)
+    # target_hsv = cv2.cvtColor(target_rgb, cv2.COLOR_RGB2HSV)
+
+    for i in range(len(labels)):
+        if label_map[i] in exclude:
+            target_rgb[target == label_map[i]] = (0, 0, 0)
+        # elif label_map[i] in black:
+        #     target_rgb[target == label_map[i]] = (0, 0, 0)
+        else:
+            target_rgb[target == label_map[i]] = colors[i]
     return np.float32(target_rgb * 1./255)
 
 
@@ -173,7 +193,8 @@ def plot_segment_debug(output_path, title,
     show_image(axs[1, 3], ridges,  title="Ridges")
 
     show_image(axs[2, 0], highlighted_seeds,  title="Highlighted Labels")
-    show_image(axs[2, 1], highlighted_segments,  title="Highlighted Segments")
+    show_image(axs[2, 1], highlighted_segments,
+               title="Highlighted Segments")
     show_image(axs[2, 2], binary_dilated,  title="Binary Dilated")
 
     plt.savefig(output_path / "debug.png", dpi=300)
@@ -241,7 +262,8 @@ def visualize_common_borders_map(output_path: Path, common_borders_map):
 
 
 def visualize_segmentation(output_path: Path, G, segments, cropped, name):
-    segments_color = convert_uint8_to_rgb_random(segments, [0])
+    segments_color = convert_uint8_to_rgb_random_rgb(
+        segments, exclude=[0, np.max(np.unique(segments))])
     highlighted_segment = highlight(cropped, segments_color, (1., 1., 1.), 0.6)
 
     _, ax = plt.subplots(1, 1)
