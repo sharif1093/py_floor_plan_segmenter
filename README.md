@@ -16,6 +16,18 @@ python -m py_floor_plan_segmenter -i /app/sandbox/maps/sample -p /app/sandbox/ou
 python -m py_floor_plan_segmenter -i /app/sandbox/maps/sample -p /app/sandbox/out --debug --animate
 ```
 
+### Running the benchmarks
+
+```bash
+```
+
+
+### Evaluation of benchmarks
+
+```bash
+export BUILDING=08_lab_f && python -m py_floor_plan_segmenter.evaluate -i sandbox/out/benchmark/no_furniture/$BUILDING/sigma=1.0,0.5 -g sandbox/maps/benchmark/groundtruth/$BUILDING
+```
+
 ### Running the API server
 
 ```bash
