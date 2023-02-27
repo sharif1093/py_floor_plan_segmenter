@@ -252,38 +252,6 @@ def remove_small_connected_components(src: np.ndarray, method: str = "fixed", mi
         return result
 
 
-def denoise(src: np.ndarray, h: float = 3, templateWindowSize: int = 7, searchWindowSize: int = 21):
-    """This function denoises the black area of an image
-
-    Args:
-        src (np.ndarray): The input map in dtype (np.float32) and size (width, height)
-        h (float, optional): Defaults to 3.
-        templateWindowSize (int, optional): Defaults to 7.
-        searchWindowSize (int, optional): Defaults to 21.
-
-    Returns:
-        np.ndarray: The output map in dtype (np.float32) and size (width, height)
-    """
-
-    result = cv2.fastNlMeansDenoising(
-        np.uint8(src * 255), None, h, templateWindowSize, searchWindowSize)
-    return np.float32(result * 1./255)
-
-
-def generate_ridge_map(src: np.ndarray):
-    """Generates the ridge map from the source map
-
-    Args:
-        src (np.ndarray): The input map in dtype (np.float32) and size (width, height)
-
-    Returns:
-        np.ndarray: The output map in dtype (np.float32) and size (width, height).
-    """
-    ridge_filter = cv2.ximgproc.RidgeDetectionFilter_create(dx=1, dy=1, ksize=1, scale=1, delta=0,
-                                                            borderType=cv2.BORDER_REPLICATE)
-    return ridge_filter.getRidgeFilteredImage(src)
-
-
 def generate_ridge_map_meijering(src: np.ndarray, mode: str = 'constant', sigmas=[2]):
     """This is a ridge generation function which uses skimage and resemples Mathematica RidgeDetect more.
 

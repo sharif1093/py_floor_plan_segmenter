@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 import yaml
+import time
 
 from py_floor_plan_segmenter.modules import do_segment
 from py_floor_plan_segmenter.modules import export_global_segments_map
@@ -80,6 +81,9 @@ if __name__ == "__main__":
     debugger.init(config, args.debug, args.animate)
     debugger.add("is_range", False if sigma_step == 0 else True)
     raw = load_gray_map_from_file(rank_file)
+    start = time.time()
     segments = do_segment(raw, **config)
+    end = time.time()
+    print(f"  .. processing time: {end-start:4.2f}s")
     export_global_segments_map(output_path, segments)
     debugger.generate_reports(output_path)

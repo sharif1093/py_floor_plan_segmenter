@@ -5,7 +5,7 @@ import pprint
 import yaml
 import numpy as np
 
-from py_floor_plan_segmenter.debugging.visualization import visualize_segmentation, visualize_graph, visualize_segments_double, plot_sigmas_vs_ncc, plot_segment_debug, gen_highlighted_seeds, gen_highlighted_segments, plot_hist_and_sliding_average
+from py_floor_plan_segmenter.debugging.visualization import visualize_segmentation, visualize_graph, visualize_segments_double, plot_sigmas_vs_ncc, plot_segment_debug, gen_highlighted_seeds, gen_highlighted_segments, plot_hist_and_sliding_average, dump_color_image, close_all_figures
 from py_floor_plan_segmenter.debugging.animation import FrameStacker, FrameStackerToFile
 from collections import OrderedDict
 
@@ -29,6 +29,7 @@ class DebuggingFactory(metaclass=Singleton):
         self.config = config
         self.debug = debug
         self.animate = animate
+        self.animate_labels = animate
 
     def add(self, key, value):
         if not self.debug:
@@ -92,6 +93,7 @@ class DebuggingFactory(metaclass=Singleton):
             plot_sigmas_vs_ncc(
                 self.collection["sigmas_list"], self.collection["nccs_list"], path=output_path)
 
+            close_all_figures()
             # animation of labels/segments
             if self.animate:
                 fs = FrameStacker(OrderedDict({"seeds": {"title": "Highlighted Labels"},
@@ -104,9 +106,24 @@ class DebuggingFactory(metaclass=Singleton):
                     res = {"seeds": gen_highlighted_seeds(labels, self.collection["binary_dilated"]),
                            "segments": gen_highlighted_segments(segments, self.collection["cropped"])}
                     fs.add(
-                        res, {"title": "Sigma = {:05.2F}, NCC = {:02d}".format(sigma, ncc)})
+                        res, {"title": "$\sigma$ = {:05.2F}, NCC = {:02d}".format(sigma, ncc)})
                 fs_to_file = FrameStackerToFile(fs, rows=1, cols=2)
                 fs_to_file.process(output_path/"animation.mp4")
+
+            close_all_figures()
+            if self.animate_labels:
+                output_seeds_directory = output_path / "seeds"
+                output_seeds_directory.mkdir(exist_ok=True)
+                for index in range(len(self.collection["sigmas_list"])):
+                    sigma = self.collection["sigmas_list"][index]
+                    labels = self.collection["labels_list"][index]
+                    labels_colored = gen_highlighted_seeds(
+                        labels, self.collection["binary_dilated"])
+                    animate_labels_path = output_seeds_directory / \
+                        f"seed_{index}.png"
+                    dump_color_image(
+                        labels_colored, f"$\sigma$ = {sigma:05.2F}", animate_labels_path)
+            close_all_figures()
 
         else:
             # brief.png

@@ -164,10 +164,22 @@ def visualize_segments_double(output_path: Path, seeds, segments, cropped, dilat
     highlighted_seeds = gen_highlighted_seeds(seeds, dilated)
 
     fig, ax = plt.subplots(1, 2)
-    fig.suptitle(title, fontsize=14)
-    show_image(ax[0], highlighted_seeds, title="Labels on dilated rank")
-    show_image(ax[1], highlighted_segments, title="Segments on raw rank")
+    # fig.suptitle(title, fontsize=14)
+    show_image(ax[0], highlighted_seeds, title="Superposed seed map")
+    show_image(ax[1], highlighted_segments, title="Over-segmented map")
     plt.savefig(output_path / f"{name}.png", dpi=600)
+
+
+def close_all_figures():
+    plt.close('all')
+
+
+def dump_color_image(src, title, path):
+    _, axs = plt.subplots(1, 1)
+    show_image(axs, src, title=title)
+    # axs.set_title("NCC vs Sigma")
+    plt.savefig(path, dpi=150)
+    plt.clf()
 
 
 def plot_segment_debug(output_path, title,
