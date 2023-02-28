@@ -280,6 +280,10 @@ def visualize_segmentation(output_path: Path, G, segments, cropped, name):
 
     _, ax = plt.subplots(1, 1)
     show_image(ax, highlighted_segment)
+
+    plt.axis('on')
+    plt.tick_params(axis='x', which='both', bottom=False, labelbottom=False,
+                    top=True, labeltop=True)
     plt.savefig(output_path / f"{name}_no_graph.png", dpi=600)
     draw_graph(ax, G)
     plt.savefig(output_path / f"{name}.png", dpi=600)
