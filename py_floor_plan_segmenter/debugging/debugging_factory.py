@@ -5,7 +5,7 @@ import pprint
 import yaml
 import numpy as np
 
-from py_floor_plan_segmenter.debugging.visualization import visualize_segmentation, visualize_graph, visualize_segments_double, plot_sigmas_vs_ncc, plot_segment_debug, gen_highlighted_seeds, gen_highlighted_segments, plot_hist_and_sliding_average, dump_color_image, close_all_figures
+from py_floor_plan_segmenter.debugging.visualization import visualize_segmentation, visualize_graph, visualize_segments_double, plot_sigmas_vs_ncc, plot_segment_debug, gen_highlighted_seeds, gen_highlighted_segments, plot_hist_and_sliding_average, dump_color_image, close_all_figures, dump_results
 from py_floor_plan_segmenter.debugging.animation import FrameStacker, FrameStackerToFile
 from collections import OrderedDict
 
@@ -52,6 +52,11 @@ class DebuggingFactory(metaclass=Singleton):
             yaml.dump(self.config, f, Dumper=yaml.SafeDumper, sort_keys=False)
 
         if self.collection["is_range"]:
+            # Dump pure results
+            dump_results(output_path,
+                         segments=self.collection["segments_merged_by_edge"],
+                         cropped=self.collection["cropped"])
+
             # merge_by_edge.png & merge_by_edge_no_graph.png
             visualize_segmentation(output_path,
                                    G=self.collection["G3"],

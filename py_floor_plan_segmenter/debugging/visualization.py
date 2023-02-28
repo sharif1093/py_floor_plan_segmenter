@@ -1,4 +1,6 @@
+from skimage import color
 import cv2
+import copy
 import numpy as np
 import random
 from pathlib import Path
@@ -271,6 +273,39 @@ def visualize_common_borders_map(output_path: Path, common_borders_map):
     _, axs = plt.subplots(1, 1)
     show_image(axs, common_borders_map)
     plt.savefig(output_path / "common_borders_map.png", dpi=600)
+
+
+def labels_2_colored(labels, background=0):
+    colors = [(np.random.randint(0, 255), np.random.randint(0, 255),
+               np.random.randint(0, 255)) for _ in range(1, labels.max() + 1)]
+    colored = color.label2rgb(
+        labels,  bg_label=background, bg_color=(0, 0, 0), colors=colors)
+    bgr = cv2.cvtColor(colored.astype(np.float32), cv2.COLOR_RGB2BGR)
+    return bgr
+
+
+def labels_2_colored_with_background(labels, image, background=0):
+    colors = [(np.random.randint(0, 255), np.random.randint(0, 255),
+               np.random.randint(0, 255)) for _ in range(1, labels.max() + 1)]
+    colored = color.label2rgb(
+        labels, image=image, image_alpha=1, bg_label=background, bg_color=(0, 0, 0), colors=colors, alpha=0.6, kind='overlay')
+    bgr = cv2.cvtColor(colored.astype(np.float32), cv2.COLOR_RGB2BGR)
+    return bgr
+
+
+def dump_results(output_path: Path, segments, cropped, name="final"):
+    # Save a pure version
+    segments_no_border = copy.deepcopy(segments)
+    segments_no_border[segments == np.max(segments)] = 0
+
+    #####
+    segments_colored = labels_2_colored(segments_no_border, background=0)
+    cv2.imwrite(str(output_path / f"{name}_segment.png"), segments_colored)
+
+    highlighted_segment = labels_2_colored_with_background(
+        segments_no_border, 255*cropped, background=0)
+
+    cv2.imwrite(str(output_path / f"{name}_overlay.png"), highlighted_segment)
 
 
 def visualize_segmentation(output_path: Path, G, segments, cropped, name):

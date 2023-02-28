@@ -11,16 +11,21 @@ docker build -t py_floor_plan_segmenter .
 docker run -u cloud -v .:/app -it py_floor_plan_segmenter bash
 
 # Example command to only do the segmentation
-python -m py_floor_plan_segmenter -i /app/sandbox/maps/sample -p /app/sandbox/out
+python -m py_floor_plan_segmenter -i /app/sandbox/maps/sample_1 -p /app/sandbox/out
 # Example command with debug and animate flags
-python -m py_floor_plan_segmenter -i /app/sandbox/maps/sample -p /app/sandbox/out --debug --animate
+python -m py_floor_plan_segmenter -i /app/sandbox/maps/sample_1 -p /app/sandbox/out --debug --animate
 ```
 
 ### Running the benchmarks
 
-```bash
-```
+When in docker interactive mode:
 
+```bash
+cd /app
+
+./run_benchmark.sh benchmark/no_furniture 
+./run_benchmark.sh benchmark/furnished
+```
 
 ### Evaluation of benchmarks
 
