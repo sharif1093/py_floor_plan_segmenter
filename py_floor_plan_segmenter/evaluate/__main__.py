@@ -1,5 +1,6 @@
 from py_floor_plan_segmenter.segment import crop_single_info, crop_background
 from py_floor_plan_segmenter.segment import load_map_from_file_uint8, make_gray
+from py_floor_plan_segmenter.debugging.visualization import labels_2_colored
 import argparse
 from pathlib import Path
 import cv2
@@ -8,15 +9,6 @@ from skimage import measure
 from sklearn import metrics
 from skimage import color
 from skimage import segmentation
-
-
-def labels_2_colored(labels, background=0):
-    colors = [(np.random.randint(0, 255), np.random.randint(0, 255),
-               np.random.randint(0, 255)) for _ in range(1, labels.max() + 1)]
-    colored = color.label2rgb(
-        labels,  bg_label=background, bg_color=(0, 0, 0), colors=colors)
-    bgr = cv2.cvtColor(colored.astype(np.float32), cv2.COLOR_RGB2BGR)
-    return bgr
 
 
 def relabel(labels, background=0):
@@ -79,6 +71,8 @@ if __name__ == "__main__":
                         help="The path to the input directory.")
     parser.add_argument("-g", "--ground-truth", type=Path, required=True,
                         help="The path to the ground truth label.")
+    parser.add_argument("-p", "--output-path", type=Path, required=True,
+                        help="Output directory root for evaluation results.")
     args = parser.parse_args()
 
     #############################
@@ -90,7 +84,7 @@ if __name__ == "__main__":
         exit(1)
     else:
         input_path = args.input
-        base_name = args.input.name
+        base_name = args.input.parent.name
 
         rank_file = args.input / "global_prior_map.pgm"
         if not rank_file.is_file():
@@ -102,7 +96,9 @@ if __name__ == "__main__":
             print(f"label.png does no exist in the {args.input}!")
             exit(1)
 
-    print(f"  .. input: {input_path}")
+    # We create the output directory ourselves, no problem.
+    output_path = args.output_path
+    output_path.mkdir(parents=True, exist_ok=True)
 
     rank_labels = make_gray(load_map_from_file_uint8(rank_file))
     ground_truth_mask = make_gray(load_map_from_file_uint8(ground_truth_file))
@@ -118,15 +114,12 @@ if __name__ == "__main__":
     # rank_labels = measure.label(rank_labels, background=0)
     ground_truth_labels = measure.label(ground_truth_mask, background=0)
 
-    cv2.imwrite("z_rank.png", labels_2_colored(rank_labels, background=0))
-    cv2.imwrite("z_gt.png", labels_2_colored(
+    cv2.imwrite(str(output_path/f"{base_name}_pred.png"),
+                labels_2_colored(rank_labels, background=0))
+    cv2.imwrite(str(output_path/f"{base_name}_gt.png"), labels_2_colored(
         ground_truth_labels, background=0))
 
     rank_labels, _, _ = segmentation.relabel_sequential(rank_labels)
-
-
-    cv2.imwrite("z_rank_remapped.png", labels_2_colored(
-        rank_labels, background=0))
 
     ground_truth_labels_ravel = ground_truth_labels.ravel()
     rank_labels_ravel = rank_labels.ravel()
@@ -143,7 +136,6 @@ if __name__ == "__main__":
         rank_labels_ravel_background != 0]
     over_painting = len(non_zero_rank_labels_ravel_background) / \
         len(ground_truth_labels_ravel_foreground)
-    print(f"over_painting: {over_painting:1.5f}")
 
     # Remove background cells that are in the Rank
     rk_background_cells = rank_labels_ravel_foreground == 0
@@ -158,54 +150,68 @@ if __name__ == "__main__":
         rk_background_cells]
     under_painting = len(rank_labels_ravel_foreground_background) / \
         len(ground_truth_labels_ravel_foreground)
-    print(f"under_painting: {under_painting:1.5f}")
-
-    print("----------------------")
 
     # Create an alias
     y_pred = rank_labels_ravel_foreground_foreground
     y_true = ground_truth_labels_ravel_foreground_foreground
 
-    print("Number of pred clusters:", len(np.unique(y_pred)))
-    print("Number of true clusters:", len(np.unique(y_true)))
-
     ######################
     ## Calculate scores ##
     ######################
-    # Relabel, to check invariance to permutation
-    y_pred_re = relabel(y_pred, background=0)
-    # print("Sanity check of relabeling =", np.unique(y_pred - y_pred_re))
-    # y_true_re = relabel(y_true, background=0)
 
     over_segmentation_score, completeness_score, over_mixing_score, homogeneity_score, v_score, nmi_score, ami_score, ari_score, fmi_score = calculate_all_scores(
         y_true, y_pred)
 
-    over_segmentation_score_re, completeness_score_re, over_mixing_score_re, homogeneity_score_re, v_score_re, nmi_score_re, ami_score_re, ari_score_re, fmi_score_re = calculate_all_scores(
-        y_true, y_pred_re)
+    # Print a one line result
+    print(base_name,
+          len(np.unique(y_true)), len(np.unique(y_pred)),
+          over_painting, under_painting,
+          over_segmentation_score, completeness_score,
+          over_mixing_score, homogeneity_score,
+          v_score, ami_score, nmi_score,
+          ari_score, fmi_score, sep=",")
 
     ###########################
+    # UNCOMMENT FOR DEBUGGING #
     ###########################
-    print_metric("over_segmentation_score", over_segmentation_score,
-                 over_segmentation_score/over_segmentation_score_re)
-    print_metric("completeness_score", completeness_score,
-                 completeness_score/completeness_score_re)
-    print("----------------------")
+    # # Relabel, to check invariance to permutation
+    # y_pred_re = relabel(y_pred, background=0)
+    # # print("Sanity check of relabeling =", np.unique(y_pred - y_pred_re))
+    # # y_true_re = relabel(y_true, background=0)
+    # over_segmentation_score_re, completeness_score_re, over_mixing_score_re, homogeneity_score_re, v_score_re, nmi_score_re, ami_score_re, ari_score_re, fmi_score_re = calculate_all_scores(
+    #     y_true, y_pred_re)
+    ###########################
+    # print(f"  .. input: {input_path}")
+    # print(f"  .. output: {output_path}")
+    # print("----------------------")
+    # print("Number of pred clusters:", len(np.unique(y_pred)))
+    # print("Number of true clusters:", len(np.unique(y_true)))
+    # print("----------------------")
+    # print(f"over_painting: {over_painting:1.5f}")
+    # print(f"under_painting: {under_painting:1.5f}")
+    # # This is the recall metric
+    # print_metric("over_segmentation_score", over_segmentation_score,
+    #              over_segmentation_score/over_segmentation_score_re)
+    # print_metric("completeness_score", completeness_score,
+    #              completeness_score/completeness_score_re)
+    # print("----------------------")
 
-    print_metric("over_mixing_score", over_mixing_score,
-                 over_mixing_score/over_mixing_score_re)
-    print_metric("homogeneity_score", homogeneity_score,
-                 homogeneity_score/homogeneity_score_re)
-    print("----------------------")
+    # # This is the precision metric
+    # print_metric("over_mixing_score", over_mixing_score,
+    #              over_mixing_score/over_mixing_score_re)
+    # print_metric("homogeneity_score", homogeneity_score,
+    #              homogeneity_score/homogeneity_score_re)
+    # print("----------------------")
 
-    print_metric("v_score", v_score,
-                 v_score/v_score_re)
-    print_metric("ami_score", ami_score,
-                 ami_score/ami_score_re)
-    print_metric("nmi_score", nmi_score,
-                 nmi_score/nmi_score_re)
-    print("----------------------")
+    # print_metric("v_score", v_score,
+    #              v_score/v_score_re)
+    # print_metric("ami_score", ami_score,
+    #              ami_score/ami_score_re)
+    # print_metric("nmi_score", nmi_score,
+    #              nmi_score/nmi_score_re)
+    # print("----------------------")
 
-    print_metric("ari_score", ari_score,
-                 ari_score/ari_score_re)
-    print_metric("fmi_score", fmi_score,
-                 fmi_score/fmi_score_re)
+    # print_metric("ari_score", ari_score,
+    #              ari_score/ari_score_re)
+    # print_metric("fmi_score", fmi_score,
+    #              fmi_score/fmi_score_re)

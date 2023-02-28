@@ -30,7 +30,7 @@ cd /app
 ### Evaluation of benchmarks
 
 ```bash
-export BUILDING=08_lab_f && python -m py_floor_plan_segmenter.evaluate -i sandbox/out/benchmark/no_furniture/$BUILDING/sigma=1.0,0.5 -g sandbox/maps/benchmark/groundtruth/$BUILDING
+export BUILDING=08_lab_f && export TYPE=no_furniture && python -m py_floor_plan_segmenter.evaluate -i sandbox/out/benchmark/$TYPE/$BUILDING/sigma=1.0,0.5 -p sandbox/eval/$TYPE -g sandbox/maps/benchmark/groundtruth/$BUILDING
 ```
 
 ### Running the API server
