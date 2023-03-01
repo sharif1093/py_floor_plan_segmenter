@@ -25,16 +25,30 @@ def relabel(labels, background=0):
     return shuffled
 
 
-def calculate_all_scores(y_true, y_pred):
+def calc_iou(contingency_matrix):
+    rows, _ = contingency_matrix.shape
+    iou = np.zeros((rows,), dtype=np.float32)
+    for r in range(rows):
+        max_element_index = np.argmax(contingency_matrix[r])
+        intersection = contingency_matrix[r][max_element_index]
+        union = np.sum(
+            contingency_matrix[r]) + np.sum(contingency_matrix[:, max_element_index])-intersection
+        iou[r] = intersection/union
+    return np.mean(iou)
+
+
+def calculate_all_scores(y_true, y_pred, contingency_file):
     # Contingency Matrix
     contingency_matrix = metrics.cluster.contingency_matrix(y_true, y_pred)
+
+    iou_score = calc_iou(contingency_matrix)
 
     max_in_cols = np.max(contingency_matrix, axis=0)
     max_in_rows = np.max(contingency_matrix, axis=1)
 
     sum_of_cols = np.sum(contingency_matrix, axis=0)
     sum_of_rows = np.sum(contingency_matrix, axis=1)
-    # np.savetxt("contingency.txt", contingency_matrix, fmt="%6d'")
+    np.savetxt(contingency_file, contingency_matrix, fmt="%6d'")
 
     EPS = 1e-6
     over_segmentation_scores = max_in_rows / (sum_of_rows + EPS)
@@ -54,7 +68,7 @@ def calculate_all_scores(y_true, y_pred):
     fmi_score = metrics.fowlkes_mallows_score(y_true, y_pred)
     ari_score = metrics.adjusted_rand_score(y_true, y_pred)
 
-    return np.mean(over_segmentation_scores), completeness_score, np.mean(over_mixing_scores), homogeneity_score, v_score, nmi_score, ami_score, ari_score, fmi_score
+    return np.mean(over_segmentation_scores), completeness_score, np.mean(over_mixing_scores), homogeneity_score, v_score, nmi_score, ami_score, ari_score, fmi_score, iou_score
 
 
 def print_metric(name, value, sanity):
@@ -159,8 +173,8 @@ if __name__ == "__main__":
     ## Calculate scores ##
     ######################
 
-    over_segmentation_score, completeness_score, over_mixing_score, homogeneity_score, v_score, nmi_score, ami_score, ari_score, fmi_score = calculate_all_scores(
-        y_true, y_pred)
+    over_segmentation_score, completeness_score, over_mixing_score, homogeneity_score, v_score, nmi_score, ami_score, ari_score, fmi_score, iou_score = calculate_all_scores(
+        y_true, y_pred, output_path/f"{base_name}_contingency.txt")
 
     # Print a one line result
     print(base_name,
@@ -169,7 +183,7 @@ if __name__ == "__main__":
           over_segmentation_score, completeness_score,
           over_mixing_score, homogeneity_score,
           v_score, ami_score, nmi_score,
-          ari_score, fmi_score, sep=",")
+          ari_score, fmi_score, iou_score, sep=",")
 
     ###########################
     # UNCOMMENT FOR DEBUGGING #
