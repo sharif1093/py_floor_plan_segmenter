@@ -266,7 +266,7 @@ def generate_ridge_map_meijering(src: np.ndarray, mode: str = 'constant', sigmas
     return meijering(src, sigmas=sigmas, mode=mode)
 
 
-def generate_gaussian_seeds_skimage(src: np.ndarray, sigma: float, threshold: float = 0.05, background_erosion_kernel_size: int = 5):
+def generate_gaussian_seeds_skimage(src: np.ndarray, background_mask, sigma: float, threshold: float = 0.05):
     """A function to generate Gaussian seeds for a binary map
 
     Args:
@@ -288,11 +288,8 @@ def generate_gaussian_seeds_skimage(src: np.ndarray, sigma: float, threshold: fl
     res_bin_uint8 = 255 - np.uint8(res_bin*255)
     lbl, _ = label(res_bin_uint8)
 
-    # Add the background seed
-    background = cv2.erode(src, kernel=np.ones(
-        (background_erosion_kernel_size, background_erosion_kernel_size)))
     # Change background label to 255
-    lbl[background == 1] = 255
+    lbl[background_mask] = 255
 
     return lbl
 

@@ -65,9 +65,9 @@ compute_labels_list:
   sigma_start: *sigma_start
   sigma_step: *sigma_step
   max_iter: 200
+  background_erosion_kernel_size: 5
   generate_gaussian_seeds_skimage:
     threshold: 0.05
-    background_erosion_kernel_size: 5
   create_watershed_segment_skimage:
     connectivity: 4
 over_segment:

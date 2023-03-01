@@ -50,7 +50,7 @@ def generate_denoised_alone(raw, **config):
 
 
 # @profile
-def compute_labels_list(binary_dilated: np.ndarray, ridges: np.ndarray, sigma_start, sigma_step, max_iter, debug: bool = False, **config):
+def compute_labels_list(binary_dilated: np.ndarray, ridges: np.ndarray, sigma_start, sigma_step, max_iter, background_erosion_kernel_size: int = 5, debug: bool = False, **config):
     # What is inside in this section should be refactored
 
     sigmas_list = []
@@ -64,9 +64,13 @@ def compute_labels_list(binary_dilated: np.ndarray, ridges: np.ndarray, sigma_st
     sigma = sigma_start
     if sigma_step == 0:
         max_iter = 1
+    # Add the background seed
+    # compute_labels_list
+    background_mask = (cv2.erode(binary_dilated, kernel=np.ones(
+        (background_erosion_kernel_size, background_erosion_kernel_size))) == 1)
     while (ncc > 0) and (iter < max_iter):
         labels = generate_gaussian_seeds_skimage(
-            binary_dilated, sigma=sigma, **config["generate_gaussian_seeds_skimage"])
+            binary_dilated, background_mask=background_mask, sigma=sigma, **config["generate_gaussian_seeds_skimage"])
 
         # Compute ncc (minus borders and background)
         ncc = max(0, len(np.unique(labels)) - 2)
