@@ -135,6 +135,12 @@ if __name__ == "__main__":
 
     rank_labels, _, _ = segmentation.relabel_sequential(rank_labels)
 
+    # # Manually distort the segmentation results here:
+    # rank_labels[rank_labels == X] = Y
+    # # You may save the distorted segmentation as well:
+    # cv2.imwrite(str(output_path/f"{base_name}_distorted.png"), labels_2_colored(
+    #     rank_labels, background=0))
+
     ground_truth_labels_ravel = ground_truth_labels.ravel()
     rank_labels_ravel = rank_labels.ravel()
 
@@ -184,48 +190,3 @@ if __name__ == "__main__":
           over_mixing_score, homogeneity_score,
           v_score, ami_score, nmi_score,
           ari_score, fmi_score, iou_score, sep=",")
-
-    ###########################
-    # UNCOMMENT FOR DEBUGGING #
-    ###########################
-    # # Relabel, to check invariance to permutation
-    # y_pred_re = relabel(y_pred, background=0)
-    # # print("Sanity check of relabeling =", np.unique(y_pred - y_pred_re))
-    # # y_true_re = relabel(y_true, background=0)
-    # over_segmentation_score_re, completeness_score_re, over_mixing_score_re, homogeneity_score_re, v_score_re, nmi_score_re, ami_score_re, ari_score_re, fmi_score_re = calculate_all_scores(
-    #     y_true, y_pred_re)
-    ###########################
-    # print(f"  .. input: {input_path}")
-    # print(f"  .. output: {output_path}")
-    # print("----------------------")
-    # print("Number of pred clusters:", len(np.unique(y_pred)))
-    # print("Number of true clusters:", len(np.unique(y_true)))
-    # print("----------------------")
-    # print(f"over_painting: {over_painting:1.5f}")
-    # print(f"under_painting: {under_painting:1.5f}")
-    # # This is the recall metric
-    # print_metric("over_segmentation_score", over_segmentation_score,
-    #              over_segmentation_score/over_segmentation_score_re)
-    # print_metric("completeness_score", completeness_score,
-    #              completeness_score/completeness_score_re)
-    # print("----------------------")
-
-    # # This is the precision metric
-    # print_metric("over_mixing_score", over_mixing_score,
-    #              over_mixing_score/over_mixing_score_re)
-    # print_metric("homogeneity_score", homogeneity_score,
-    #              homogeneity_score/homogeneity_score_re)
-    # print("----------------------")
-
-    # print_metric("v_score", v_score,
-    #              v_score/v_score_re)
-    # print_metric("ami_score", ami_score,
-    #              ami_score/ami_score_re)
-    # print_metric("nmi_score", nmi_score,
-    #              nmi_score/nmi_score_re)
-    # print("----------------------")
-
-    # print_metric("ari_score", ari_score,
-    #              ari_score/ari_score_re)
-    # print_metric("fmi_score", fmi_score,
-    #              fmi_score/fmi_score_re)
