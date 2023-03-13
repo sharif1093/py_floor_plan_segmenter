@@ -5,14 +5,16 @@
 
 Click on any of the following cases to view the comparison results with the three state-of-the-art methods introduced in [Bormann et al.](https://ieeexplore.ieee.org/document/7487234). From left to right the methods are: (1) ground truth labels, (2) morphologic segmentation, (3) distance-transform-based segmentation, (4) Voronoi-graph-based segmentation, and (5) our down-sampling-based segmentation.
 
-<details>
-  <summary>With furniture</summary>
+<details><summary>With furniture</summary>
+<p>
 ![](sandbox/results/furnished.png)
+</p>
 </details>
 
-<details>
-  <summary>No furniture</summary>
+<details><summary>No furniture</summary>
+<p>
 ![](sandbox/results/no_furniture.png)
+</p>
 </details>
 
 ## Usage
