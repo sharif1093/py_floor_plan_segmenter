@@ -1,5 +1,20 @@
 # py_floor_plan_segmenter
 
+
+## Detailed Comparisons with the state
+
+Click on any of the following cases to view the comparison results with the three state-of-the-art methods introduced in [Bormann et al.](https://ieeexplore.ieee.org/document/7487234). From left to right the methods are: (1) ground truth labels, (2) morphologic segmentation, (3) distance-transform-based segmentation, (4) Voronoi-graph-based segmentation, and (5) our down-sampling-based segmentation.
+
+<details>
+  <summary>With furniture</summary>
+![](sandbox/results/furnished.png)
+</details>
+
+<details>
+  <summary>No furniture</summary>
+![](sandbox/results/no_furniture.png)
+</details>
+
 ## Usage
 
 ### Interactive testing in the container
