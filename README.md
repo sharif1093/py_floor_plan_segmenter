@@ -7,13 +7,13 @@ Click on any of the following cases to view the comparison results with the thre
 
 <details><summary>With furniture</summary>
 <p>
-![](sandbox/results/furnished.png)
+  <img src="./sandbox/results/furnished.png" alt="Furnished maps benchmark">
 </p>
 </details>
 
 <details><summary>No furniture</summary>
 <p>
-![](sandbox/results/no_furniture.png)
+  <img src="./sandbox/results/no_furniture.png" alt="No furniture maps benchmark">
 </p>
 </details>
 
