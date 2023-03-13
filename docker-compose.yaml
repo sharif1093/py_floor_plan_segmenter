@@ -1,10 +1,11 @@
 version: '3.8'
 
 services:
-  web:
+  server:
     build: .
     command: uvicorn py_floor_plan_segmenter.server:app --host 0.0.0.0 --port 8008 # --reload
+    user: cloud
     volumes:
       - .:/app
     ports:
-      - 8008:8008
+      - "8008:8008"
