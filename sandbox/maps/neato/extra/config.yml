@@ -1,0 +1,99 @@
+# Control Panel
+sigma_start: &sigma_start 1.0
+sigma_step: &sigma_step 0.5
+# sigma_start: &sigma_start 7.5
+# sigma_step: &sigma_step 0.0
+binary_threshold: &binary_threshold 0.2
+area_threshold: &area_threshold 1 # m^2
+length_threshold: &length_threshold 3 # m
+hist_resolution: &hist_resolution 90
+
+# Use with alignment=true only if sigma_step=0.
+alignment: true
+
+# Detailed Settings
+find_alignment_angle:
+  binary_for_crop/make_binary:
+    threshold: *binary_threshold
+  crop_single_info:
+    padding: 20
+  binary/make_binary:
+    threshold: 0.8
+  components_out/remove_small_connected_components:
+    method: mean
+    connectivity: 8
+  components_in/remove_small_connected_components:
+    method: fixed
+    min_size: 10
+  rank/make_binary:
+    threshold: *binary_threshold
+  compute_weighted_angle_histogram:
+    resolution: *hist_resolution
+    canny:
+      sigma: 2
+    probabilistic_hough_line:
+      threshold: 20
+      line_length: 10
+      line_gap: 5
+  find_best_alignment_angle_from_histogram:
+    window_half_size: 2
+    resolution: *hist_resolution
+  
+generate_denoised_alone:
+  binary_for_crop/make_binary:
+    threshold: *binary_threshold
+  crop_single_info:
+    padding: 20
+  binary/make_binary:
+    threshold: *binary_threshold
+  components_out/remove_small_connected_components:
+    method: mean
+    connectivity: 8
+  
+  ### NOTE: "Mean" mode is useful to ignore large furniture and detect actual rooms.
+  # components_in/remove_small_connected_components:
+  #   method: mean
+  #   connectivity: 8
+  ### NOTE: "Fixed" mode is useful when we want to segment with respect to large furniture and make priors "smaller".
+  # components_in/remove_small_connected_components:
+  #   method: fixed
+  #   min_size: 60
+  ### NOTE: "Fixed" mode is useful when we want to segment with respect to large furniture and make priors "smaller".
+  components_in/remove_small_connected_components:
+    method: fixed
+    min_size: 2500
+
+  rank/make_binary:
+    threshold: *binary_threshold
+dilate_binary:
+  kernel_size: 3
+  iterations: 3
+generate_ridge_map_meijering:
+  mode: constant
+  sigmas:
+  - 2
+compute_labels_list:
+  sigma_start: *sigma_start
+  sigma_step: *sigma_step
+  max_iter: 200
+  background_erosion_kernel_size: 5
+  generate_gaussian_seeds_skimage:
+    threshold: 0.05
+  create_watershed_segment_skimage:
+    connectivity: 4
+over_segment:
+  generate_map_initial_seeds:
+    method: start
+    filter_threshold: 0
+  # generate_map_initial_seeds:
+  #   method: weighted
+  #   weights:
+  #     start: 3
+  #     end: 1
+  #   filter_threshold: 0
+  create_watershed_segment_skimage:
+    connectivity: 4
+merge_nodes_in_place:
+  area_threshold: *area_threshold
+merge_edges_in_place:
+  length_threshold: *length_threshold
