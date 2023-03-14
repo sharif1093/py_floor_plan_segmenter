@@ -1,6 +1,6 @@
 # Down-sampling based 2D floor plan segmentation
 
-This repository contains the Python implementation for the the paper ["2D Floor Plan Segmentation Based on Down-sampling"](arxiv.com). This algorithm performs segmentation on a 2D floor plan by using down-sampling method. The overall pipeline is shown below. For more details please refer to the [paper](arxiv.com).
+This repository contains the Python implementation for the the paper [2D Floor Plan Segmentation Based on Down-sampling](http://arxiv.com). This algorithm performs segmentation on a 2D floor plan by using down-sampling method. The overall pipeline is shown below. For more details please refer to the [paper](http://arxiv.com).
 
 <p align='center'>
   <img src="./doc/pipeline.png" width="400" alt="Pipeline of our down-sampling-based 2D floor plan segmentation.">
@@ -69,13 +69,22 @@ Then, open your browser at the address for documentation: `http://0.0.0.0:8008/d
 
 ### Running the benchmarks and tests
 
-When in docker interactive mode:
+In docker interactive mode:
 
 ```bash
 cd /app
 
-./run_benchmark.sh benchmark/no_furniture 
-./run_benchmark.sh benchmark/furnished
+# Run benchmark furnished maps
+./run_benchmark.sh sandbox/maps/benchmark/furnished
+
+# Run benchmark maps with no furniture
+./run_benchmark.sh sandbox/maps/benchmark/no_furniture
+
+# Run Neato dataset present in the paper
+./run_benchmark.sh sandbox/maps/neato/paper
+
+# Run Neato extra dataset
+./run_benchmark.sh sandbox/maps/neato/extra
 ```
 
 ### Evaluation of benchmarks
@@ -84,4 +93,11 @@ cd /app
 export BUILDING=08_lab_f && export TYPE=no_furniture && python -m py_floor_plan_segmenter.evaluate -i sandbox/out/benchmark/$TYPE/$BUILDING/sigma=1.0,0.5 -p sandbox/eval/$TYPE -g sandbox/maps/benchmark/groundtruth/$BUILDING
 ```
 
+## Citation
+
+Please use the following BiBTeX entry for citing this work:
+
+```bibtex
+...
+```
 

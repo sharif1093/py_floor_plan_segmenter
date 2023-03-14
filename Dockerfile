@@ -21,6 +21,7 @@ RUN echo "root:rootpass" | chpasswd \
   gcc \
   build-essential \
   ffmpeg \
+  parallel \
   && apt-get clean all \
   && rm -rf /var/lib/apt/lists/*
 
