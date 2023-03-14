@@ -90,7 +90,11 @@ cd /app
 ### Evaluation of benchmarks
 
 ```bash
-export BUILDING=08_lab_f && export TYPE=no_furniture && python -m py_floor_plan_segmenter.evaluate -i sandbox/out/benchmark/$TYPE/$BUILDING/sigma=1.0,0.5 -p sandbox/eval/$TYPE -g sandbox/maps/benchmark/groundtruth/$BUILDING
+# Evaluate the furnished maps benchmark
+./run_evaluation.sh sandbox/out/furnished sandbox/maps/benchmark/groundtruth
+
+# Evaluate the no-furniture maps benchmark
+./run_evaluation.sh sandbox/out/no_furniture sandbox/maps/benchmark/groundtruth
 ```
 
 ## Citation

@@ -1,5 +1,6 @@
 # User rules
 sandbox/out
+sandbox/eval
 *.bin
 *.log
 *.dat

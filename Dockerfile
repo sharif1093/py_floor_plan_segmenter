@@ -35,6 +35,9 @@ COPY ./requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip setuptools wheel \
   && pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
+RUN pip install --upgrade pip \
+  && pip install scikit-learn
+
 # Change ownership of the /app directory
 RUN chown -R ${WORK_USER}:${WORK_USER} /app
 
