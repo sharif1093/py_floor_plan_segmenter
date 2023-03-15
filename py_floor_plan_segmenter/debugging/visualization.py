@@ -37,14 +37,17 @@ except ModuleNotFoundError:
 #############################
 
 
-def show_image(ax, img, gray=True, title=None):
+def show_image(ax, img, gray=True, title=None, fontsize=None):
     if gray:
         ax.imshow(img, cmap=plt.cm.gray)
     else:
         ax.imshow(img)
 
     if title is not None:
-        ax.set_title(title)
+        if fontsize is None:
+            ax.set_title(title)
+        else:
+            ax.set_title(title, fontsize=fontsize)
 
 
 def highlight(src, target, color, alpha):
@@ -192,24 +195,27 @@ def plot_segment_debug(output_path, title,
     highlighted_seeds = gen_highlighted_seeds(seeds, binary_dilated)
     highlighted_segments = gen_highlighted_segments(segments, cropped)
 
-    fig, axs = plt.subplots(3, 4, figsize=(12, 12), constrained_layout=True)
+    fig, axs = plt.subplots(2, 4, figsize=(12, 12), constrained_layout=True)
 
-    fig.suptitle(title, fontsize=14)
+    # fig.suptitle(title, fontsize=14)
 
-    show_image(axs[0, 0], unrotated, title="Unrotated map")
-    show_image(axs[0, 1], unrotated_processed, title="Processed")
-    show_image(axs[0, 2], unrotated_edges, title="Edges")
-    show_image(axs[0, 3], unrotated_lines, title="Lines")
+    fontsize = 18
+    show_image(axs[0, 0], unrotated, title="Raw map", fontsize=fontsize)
+    show_image(axs[0, 1], unrotated_processed,
+               title="Preprocessed", fontsize=fontsize)
+    show_image(axs[0, 2], unrotated_edges, title="Edges", fontsize=fontsize)
+    show_image(axs[0, 3], unrotated_lines, title="Lines", fontsize=fontsize)
 
-    show_image(axs[1, 0], cropped,  title="Grayscale map")
-    show_image(axs[1, 1], binary,  title="Binary map")
-    show_image(axs[1, 2], rank,  title="Processed")
-    show_image(axs[1, 3], ridges,  title="Ridges")
+    show_image(axs[1, 0], cropped,  title="Aligned map", fontsize=fontsize)
+    show_image(axs[1, 1], binary,  title="Binary map", fontsize=fontsize)
+    show_image(axs[1, 2], rank,  title="Denoised binary map",
+               fontsize=fontsize)
+    show_image(axs[1, 3], ridges,  title="Ridges", fontsize=fontsize)
 
-    show_image(axs[2, 0], highlighted_seeds,  title="Highlighted Labels")
-    show_image(axs[2, 1], highlighted_segments,
-               title="Highlighted Segments")
-    show_image(axs[2, 2], binary_dilated,  title="Binary Dilated")
+    # show_image(axs[2, 0], highlighted_seeds,  title="Highlighted Labels")
+    # show_image(axs[2, 1], highlighted_segments,
+    #            title="Highlighted Segments")
+    # show_image(axs[2, 2], binary_dilated,  title="Binary Dilated")
 
     plt.savefig(output_path / "debug.png", dpi=300)
 
