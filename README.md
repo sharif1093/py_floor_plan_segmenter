@@ -99,7 +99,7 @@ cd /app
 
 ## Citation
 
-Please use the following BiBTeX entry for citing this work:
+Please use the following BibTeX entry for citing this work:
 
 ```bibtex
 ...
