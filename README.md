@@ -1,6 +1,6 @@
 # Down-sampling-based 2D floor plan segmentation
 
-This repository contains the Python implementation for the the paper [2D Floor Plan Segmentation Based on Down-sampling](http://arxiv.com). This algorithm performs segmentation on a 2D floor plan by using down-sampling method. The overall pipeline is shown below. For more details please refer to the [paper](http://arxiv.com).
+This repository contains the Python implementation for the the paper [2D Floor Plan Segmentation Based on Down-sampling](https://arxiv.org/abs/2303.13798). This algorithm performs segmentation on a 2D floor plan by using a down-sampling technique. The overall pipeline is shown below. For more details please refer to the [paper](https://arxiv.org/abs/2303.13798).
 
 <p align='center'>
   <img src="./doc/pipeline.png" width="400" alt="Pipeline of our down-sampling-based 2D floor plan segmentation.">
@@ -102,6 +102,14 @@ cd /app
 Please use the following BibTeX entry for citing this work:
 
 ```bibtex
-...
+@ARTICLE{Sharif2023-bt,
+  title         = "{2D} Floor Plan Segmentation Based on Down-sampling",
+  author        = "Sharif, Mohammadreza and Mohan, Kiran and Suvarna, Sarath",
+  month         =  mar,
+  year          =  2023,
+  archivePrefix = "arXiv",
+  primaryClass  = "cs.CV",
+  eprint        = "2303.13798"
+}
 ```
 
